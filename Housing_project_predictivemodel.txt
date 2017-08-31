@@ -1,13 +1,14 @@
+################## Predictive Models ##############################
+
+
 ###########Exploratory Data Analysis (EDA) #####################
+House_data <-read.csv("properties.csv")    # Loading the data 
 
-House_data <-read.csv("properties.csv") # Loading the data 
 
-
-library(ggmap)
+library(ggmap)             ### Location of houses used in the project 
 dublin_map <- get_map(location = "dublin", maptype = "roadmap", zoom = 12)
-ggmap(dublin_map, extent = "device") + geom_point(aes(x = lon, y = lat), colour = I('red') , size = I(1), data = House_data, darken=.1)  # Locations of house used in the practicum on Dublin map ###########
-
-boxplot(House_data$Beds)  
+ggmap(dublin_map, extent = "device") + geom_point(aes(x = lon, y = lat), colour = I('red') , size = I(1), data = House_data, darken=.1)  
+boxplot(House_data$Beds)  ### To check the outliers in attributes beds, baths, and floorarea
 boxplot(House_data$Baths)
 boxplot(House_data$floorarea)
 dim(House_data)       # Checking the dimension of the data
@@ -62,7 +63,7 @@ House_data$Duplex[i]=1
 
 
 ### Creating dummmy variables for postcode attribute ###
-### Example: Whereever the "dublin-9" is available in Postcode attribute the value will be 1 and for the rest values will be 0. Similary, we have done for the other values such as Dublin 1, Dublin 6, Dublin 2 etc.#######
+### Example: Whereever the "dublin-9" is available in Postcode attribute the value will be 1 and for the rest values will be 0.Similary, we have done for the other values such as Dublin 1, Dublin 6, Dublin 2 etc.
 
 for(i in 1:nrow(House_data))
 {
@@ -77,12 +78,12 @@ House_data$dublin_9[i]=1
 
 Model_1<-lm(Price ~ Beds + Baths + as.factor(Type) + floorarea + as.factor(postcode), data=House_data)
 Model_1
-summary(Model_1)   ### Summary of Model 1 ###
+summary(Model_1)   ### Summary of Model 1 
 
 par(mfrow=c(2,2))
-plot(Model_1)     ### Redidual plots of Model 1 ###
+plot(Model_1)     ### Redidual plots of Model 1 
 
-predict(Model_1)  ### Predicted values of Model 1 ###
+predict(Model_1)  ### Predicted values of Model 1
 
 yhat_1=predict(Model_1, House_data,interval = "confidence")
 predicted_1<- House_data$Price
@@ -96,10 +97,10 @@ plot(predict(Model_1),House_data$Price)  ### Plot of predicted vs observed value
 
 Model_2 <- lm((Price/floorarea) ~ Price + Beds + Baths + as.factor(Type) + as.factor(postcode), data=House_data)
 Model_2
-summary(Model_2)   ###Summary of Model 2 ###
+summary(Model_2)   ###Summary of Model 2 
 
 par(mfrow=c(2,2))  
-plot(Model_2)      ### Residual plots of Model 2 ###
+plot(Model_2)      ### Residual plots of Model 2 
 
 predict(Model_2)   ### Predicted values of Model 2 ###
 
