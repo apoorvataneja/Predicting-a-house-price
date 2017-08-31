@@ -1,0 +1,153 @@
+# Predicting-a-house-price
+A model that predicts the asking price of a house on sale
+###########Exploratory Data Analysis (EDA) #####################
+
+House_data <-read.csv("properties.csv") # Loading the data 
+
+                      # Locations of house used in the practicum on Dublin map ###########
+boxplot(House_data$Beds)  
+boxplot(House_data$Baths)
+boxplot(House_data$floorarea)
+dim(House_data)       # Checking the dimension of the data
+str(House_data)       # Checking the types of the variable
+summary(House_data)   # Summary of the data
+
+############### Creating dummy variables ################
+
+House_data$Bungalow<-0    #### Creating an attribute named Bungalow in the data which consists Zero for every row
+House_data$Detached<-0
+House_data$Semi_Detached<-0
+House_data$Townhouse<-0
+House_data$End_Terrace_House<-0
+House_data$Terraced<-0
+House_data$Duplex<-0
+House_data$Apartment<-0
+
+House_data$dublin_18 <-0
+House_data$dublin_2<-0
+House_data$dublin_24<-0
+House_data$dublin_3<-0
+House_data$dublin_4<-0
+House_data$dublin_6<-0
+House_data$dublin_8<-0
+House_data$dublin_11<-0
+House_data$dublin_12<-0
+House_data$dublin_14<-0
+House_data$dublin_15<-0
+House_data$dublin_16 <-0
+House_data$dublin_17 <-0
+House_data$dublin_22 <-0
+House_data$dublin_6w <-0
+House_data$dublin_7 <-0
+House_data$dublin_10 <-0
+House_data$dublin_13 <-0
+House_data$dublin_20 <-0
+House_data$dublin_5 <-0
+House_data$dublin_9 <-0
+
+
+########## Restructuring the data:changing categorical variables such as Type of the house and postcode into dummy variables)##########
+### Creating Dummmy Variable for Type attribute ###
+### Example: Whereever the "Duplex" is available in Type attribute the value will be 1 and for the rest values will be 0. Similary, we have done for the other values such as Apartment, Semi-detached, Townhoue etc.#######
+
+for(i in 1:nrow(House_data))
+{
+if(House_data$Type[i]=="Duplex")
+{
+House_data$Duplex[i]=1
+}
+}
+
+
+### Creating dummmy variables for postcode attribute ###
+### Example: Whereever the "dublin-9" is available in Postcode attribute the value will be 1 and for the rest values will be 0. Similary, we have done for the other values such as Dublin 1, Dublin 6, Dublin 2 etc.#######
+
+for(i in 1:nrow(House_data))
+{
+if(House_data$postcode[i]=="dublin_9")
+{
+House_data$dublin_9[i]=1
+}
+}
+
+
+### Model 1 ###
+
+Model_1<-lm(Price ~ Beds + Baths + as.factor(Type) + floorarea + as.factor(postcode), data=House_data)
+Model_1
+summary(Model_1)   ### Summary of Model 1 ###
+
+par(mfrow=c(2,2))
+plot(Model_1)     ### Redidual plots of Model 1 ###
+
+predict(Model_1)  ### Predicted values of Model 1 ###
+
+yhat_1=predict(Model_1, House_data,interval = "confidence")
+predicted_1<- House_data$Price
+predicted_1<- as.data.frame(cbind(predicted_1,yhat_1))
+predicted_1
+
+plot(predict(Model_1),House_data$Price)  ### Plot of predicted vs observed values of Model 1 ### 
+
+
+### Model 2 ###
+
+Model_2 <- lm((Price/floorarea) ~ Price + Beds + Baths + as.factor(Type) + as.factor(postcode), data=House_data)
+Model_2
+summary(Model_2)   ###Summary of Model 2 ###
+
+par(mfrow=c(2,2))  
+plot(Model_2)      ### Residual plots of Model 2 ###
+
+predict(Model_2)   ### Predicted values of Model 2 ###
+
+yhat_2=predict(Model_2, House_data,interval = "confidence")
+predicted_2<- House_data$Price
+predicted_2<- as.data.frame(cbind(predicted_2,yhat_2))
+predicted_2
+
+plot(predict(Model_1),(House_data$Price/House_data$floorarea)) ### Plot of predicted vs observed values
+
+
+### Model 3 ###
+
+Model_3 <- lm(log(Price/floorarea) ~ Price + Beds + Baths + as.factor(Type) + as.factor(postcode), data= House_data)
+Model_3
+summary(Model_3)  ### Summary of Model 3 ###
+
+par(mfrow=c(2,2))
+plot(Model_3)    ### Residual plots of Model 3 ###
+
+predict(Model_3) ### Predicted values of Model 3
+
+yhat_3=predict(Model_3, House_data,interval = "confidence")
+predicted_3<- House_data$Price
+predicted_3<- as.data.frame(cbind(predicted_3,yhat_3))
+predicted_3
+
+plot(predict(Model_3),(log(House_data$Price/House_data$floorarea)))  ### Plots of predicted vs observed value ### 
+
+########################################## For Model selection ##############################
+### Model 1 ###
+Data_dummy_1<-read.csv("propertiesout.csv")
+Model_1_aic<-lm(Price~., data= Data_dummy_1)
+Model_1_aic
+stepAIC(Model_1_aic)
+
+
+### Model 2 ###
+Data_dummy_2<-read.csv("propertiesoutd1.csv")
+Model_2_aic<-lm(Price_m2~., data= Data_dummy_2)
+Model_2_aic
+stepAIC(Model_2_aic)
+
+
+### Model 3 ###
+Data_dummy_3<-read.csv("propertiesoutd2.csv")
+Model_3_aic<-lm(lg_Price_m2~., data= Data_dummy_3)
+Model_3_aic
+stepAIC(Model_3_aic)
+
+
+
+
