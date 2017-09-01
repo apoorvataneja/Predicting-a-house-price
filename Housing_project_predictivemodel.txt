@@ -2,8 +2,8 @@
 
 
 ###########Exploratory Data Analysis (EDA) #####################
-House_data <-read.csv("properties.csv")    # Loading the data 
 
+House_data <-read.csv("properties.csv")    # Loading the data 
 
 library(ggmap)             ### Location of houses used in the project 
 dublin_map <- get_map(location = "dublin", maptype = "roadmap", zoom = 12)
@@ -11,6 +11,7 @@ ggmap(dublin_map, extent = "device") + geom_point(aes(x = lon, y = lat), colour 
 boxplot(House_data$Beds)  ### To check the outliers in attributes beds, baths, and floorarea
 boxplot(House_data$Baths)
 boxplot(House_data$floorarea)
+
 dim(House_data)       # Checking the dimension of the data
 str(House_data)       # Checking the types of the variable
 summary(House_data)   # Summary of the data
